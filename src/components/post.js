@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
+import '../index.css'; 
 
-function Post({ post, currentCatImage, description, onEditPost, onDeletePost }) {
-  const [editing, setEditing] = useState(false);
-  const [title, setTitle] = useState(post.title);
-  const [postDescription, setPostDescription] = useState(description);
+function Post({ post, currentCatImage, onEditPost, onDeletePost }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedDescription, setEditedDescription] = useState(post.description);
 
   const handleEditClick = () => {
-    setEditing(true);
+    setIsEditing(true);
   };
 
   const handleSaveClick = () => {
-    onEditPost(post.id, { title, description: postDescription });
-    setEditing(false);
+    onEditPost(post.id, { description: editedDescription });
+    setIsEditing(false);
   };
 
   const handleDeleteClick = () => {
@@ -19,38 +19,27 @@ function Post({ post, currentCatImage, description, onEditPost, onDeletePost }) 
   };
 
   return (
-    <div className="post">
-      <div className="post-card">
-        <div className="card-image-container">
-          <img
-            src={currentCatImage}
-            alt="Cat"
-            className="card-cat-image"
-          />
-        </div>
-        <div className="card-content">
-          <h3>{post.title}</h3>
-          <p>{description}</p>
-        </div>
-        <div className="card-buttons">
-          <button onClick={handleEditClick}>Edit</button>
-          <button onClick={handleDeleteClick}>Delete</button>
-        </div>
+    <div className="post-card">
+      <div className="image-container">
+        <img src={post.image || currentCatImage} alt="Cat" className="cat-image" />
       </div>
-      {editing && (
-        <div className="post-edit">
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+      <div className="post-details">
+        {isEditing ? (
           <textarea
-            value={postDescription}
-            onChange={(e) => setPostDescription(e.target.value)}
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
           />
+        ) : (
+          <h3>{post.title}</h3>
+        )}
+        {isEditing ? (
           <button onClick={handleSaveClick}>Save</button>
-        </div>
-      )}
+        ) : (
+          <button onClick={handleEditClick}>Edit</button>
+        )}
+        <button onClick={handleDeleteClick}>Delete</button>
+        <p>{post.description}</p>
+      </div>
     </div>
   );
 }

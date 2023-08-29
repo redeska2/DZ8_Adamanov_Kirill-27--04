@@ -6,12 +6,10 @@ import AddPost from '../src/components/addPost';
 function App() {
   const [posts, setPosts] = useState([]);
   const [currentCatImage, setCurrentCatImage] = useState('https://cataas.com/cat');
-  const [usedImages, setUsedImages] = useState([]);
 
   const addPost = (newPost, newImage) => {
-    setPosts([...posts, newPost]);
-    setCurrentCatImage(newImage);
-    setUsedImages([...usedImages, newImage]);
+    setPosts([...posts, { ...newPost, image: newImage }]);
+    setCurrentCatImage(newImage); // Обновляем картинку после добавления поста
   };
 
   const editPost = (postId, updatedPost) => {
@@ -33,15 +31,13 @@ function App() {
         onAddPost={addPost}
         currentCatImage={currentCatImage}
         setCurrentCatImage={setCurrentCatImage}
-        usedImages={usedImages}
       />
       <div className="posts">
         {posts.map((post) => (
           <Post
             key={post.id}
             post={post}
-            currentCatImage={post.image}
-            description={post.description}
+            currentCatImage={post.image} // Используем изображение из поста
             onEditPost={editPost}
             onDeletePost={deletePost}
           />

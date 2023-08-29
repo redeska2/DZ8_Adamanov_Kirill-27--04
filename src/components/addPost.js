@@ -1,58 +1,68 @@
 import React, { useState } from 'react';
+import '../index.css'; 
 
-function AddPost({
-  onAddPost,
-  currentCatImage,
-  setCurrentCatImage,
-  usedImages,
-}) {
+
+
+function AddPost({ onAddPost, currentCatImage, setCurrentCatImage, usedImages }) {
   const [title, setTitle] = useState('');
+  const [comment, setComment] = useState('');
+  const [image, setImage] = useState(''); // Добавили переменную image
 
-  const handleAddClick = () => {
-    const newImage = 'https://cataas.com/cat';
-    if (!usedImages.includes(newImage)) {
-      setCurrentCatImage(newImage); // Обновляем изображение сразу
-      const newPost = {
-        id: Date.now(),
-        title,
-        description: '',
-        image: newImage,
-      };
-      onAddPost(newPost, newImage);
-      setTitle('');
+  const getRandomCatImage = async () => {
+    const response = await fetch('https://cataas.com/cat', {
+      method: 'GET',
+    });
+
+    if (response.ok) {
+      const blob = await response.blob();
+      const imageUrl = URL.createObjectURL(blob);
+      setImage(imageUrl); // Устанавливаем значение переменной image
     } else {
-      alert('This image is already used. Please add a new one.');
+      return null;
     }
   };
 
-  const handleTitleChange = (e) => {
-    setTitle(e.target.value);
-    setCurrentCatImage('https://cataas.com/cat');
+  const handleAddClick = async () => {
+    await getRandomCatImage();
+
+    if (!image) {
+      alert('Failed to fetch new cat image.');
+      return;
+    }
+
+    const newPost = {
+      id: Date.now(),
+      title: title,
+      description: comment, // Используем значение comment для комментариев
+      image: image,
+    };
+
+    onAddPost(newPost, image);
+    setCurrentCatImage(image);
+    setTitle('');
+    setComment('');
   };
 
   return (
     <div className="add-post">
-      <h2>Add a New Post</h2>
-      <input
-        type="text"
-        placeholder="Title"
-        value={title}
-        onChange={handleTitleChange}
-      />
       <div className="image-container">
-        <img src={currentCatImage} alt="Cat" className="cat-image" />
-        <div className="card">
-          <h3>{title}</h3>
-          <div className="card-image-container">
-            <img
-              src={currentCatImage}
-              alt="Cat"
-              className="card-cat-image"
-            />
-          </div>
-        </div>
+        <img src={image || currentCatImage} alt="Cat" className="cat-image-big" />
       </div>
-      <button onClick={handleAddClick}>Add Post</button>
+      <div className="post-details">
+        <input
+          type="text"
+          placeholder="Add title..."
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Add your comments here..."
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <button onClick={handleAddClick}>Add Post</button>
+      </div>
     </div>
   );
 }
